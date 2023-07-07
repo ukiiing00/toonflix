@@ -1,11 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:toonflix/models/webtoon_model.dart';
 import 'package:toonflix/screens/home_screen.dart';
 import 'package:toonflix/screens/pomodoros_challenge_screen.dart';
+import 'package:toonflix/services/api_service.dart';
+import 'package:toonflix/widgets/button.dart';
+import 'package:toonflix/widgets/currency_card.dart';
 import 'package:toonflix/widgets/schedule_card.dart';
 
 void main() {
-  runApp(const PomodorosChallenge());
+  runApp(const WebToonHomeScreen());
+}
+
+class WebToonHomeScreen extends StatefulWidget {
+  const WebToonHomeScreen({super.key});
+
+  @override
+  State<WebToonHomeScreen> createState() => _WebToonHomeScreenState();
+}
+
+class _WebToonHomeScreenState extends State<WebToonHomeScreen> {
+  List<WebToonModel> webtoons = [];
+  bool isLoading = true;
+
+  void waitForWebToons() async {
+    webtoons = await ApiService().getTodaysToons();
+    isLoading = false;
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    waitForWebToons();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    print(webtoons);
+    print(isLoading);
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text(
+            '오늘의 웹툰',
+            style: TextStyle(
+              fontSize: 24,
+            ),
+          ),
+          backgroundColor: Colors.white,
+          foregroundColor: Colors.green,
+        ),
+      ),
+    );
+  }
 }
 
 class PomodorosChallenge extends StatefulWidget {
@@ -161,6 +209,149 @@ class CodeChallenge extends StatelessWidget {
                 withWho: ['den', 'nana', 'mark'],
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class App extends StatelessWidget {
+  const App({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        backgroundColor: const Color(0xFF181818),
+        body: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 20,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(
+                  height: 80,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        const Text(
+                          "Hey, Selena",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        Text(
+                          "Welcome back",
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+                const SizedBox(
+                  height: 50,
+                ),
+                Text(
+                  "Total Balance",
+                  style: TextStyle(
+                    fontSize: 22,
+                    color: Colors.white.withOpacity(0.8),
+                  ),
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                const Text(
+                  "\$5 194 382",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 44,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                const SizedBox(
+                  height: 30,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: const [
+                    Button(
+                      text: 'Transfer',
+                      bgColor: Color(0xFFF1B33B),
+                      textColor: Colors.black,
+                    ),
+                    Button(
+                      text: 'Request',
+                      bgColor: Color(0xFF1F2123),
+                      textColor: Colors.white,
+                    ),
+                  ],
+                ),
+                const SizedBox(
+                  height: 70,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    const Text(
+                      "Wallets",
+                      style: TextStyle(
+                        fontSize: 36,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Text(
+                      'View all',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.8),
+                        fontSize: 18,
+                      ),
+                    )
+                  ],
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                const CurrencyCard(
+                    name: "Euro",
+                    code: "EUR",
+                    amount: "6 284",
+                    icon: Icons.euro_rounded,
+                    isInverted: false),
+                Transform.translate(
+                  offset: const Offset(0, -15),
+                  child: const CurrencyCard(
+                      name: "BitCoin",
+                      code: "BTC",
+                      amount: "9 785",
+                      icon: Icons.currency_bitcoin,
+                      isInverted: true),
+                ),
+                Transform.translate(
+                  offset: const Offset(0, -30),
+                  child: const CurrencyCard(
+                      name: "Dollar",
+                      code: "USD",
+                      amount: "428",
+                      icon: Icons.attach_money,
+                      isInverted: false),
+                ),
+              ],
+            ),
           ),
         ),
       ),
