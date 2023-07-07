@@ -4,10 +4,11 @@ import 'package:http/http.dart' as http;
 import 'package:toonflix/models/webtoon_model.dart';
 
 class ApiService {
-  final String baseUrl = 'https://webtoon-crawler.nomadcoders.workers.dev';
-  final String today = 'today';
+  // state를 가지고 있지 않아서 static 으로
+  static String baseUrl = 'https://webtoon-crawler.nomadcoders.workers.dev';
+  static const String today = 'today';
 
-  Future<List<WebToonModel>> getTodaysToons() async {
+  static Future<List<WebToonModel>> getTodaysToons() async {
     List<WebToonModel> webtoonInstances = [];
     final url = Uri.parse('$baseUrl/$today');
     final response = await http.get(url);

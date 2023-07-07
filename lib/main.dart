@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:toonflix/models/webtoon_model.dart';
 import 'package:toonflix/screens/home_screen.dart';
 import 'package:toonflix/screens/pomodoros_challenge_screen.dart';
 import 'package:toonflix/services/api_service.dart';
@@ -9,36 +8,16 @@ import 'package:toonflix/widgets/currency_card.dart';
 import 'package:toonflix/widgets/schedule_card.dart';
 
 void main() {
-  runApp(const WebToonHomeScreen());
+  runApp(WebToonHomeScreen());
 }
 
-class WebToonHomeScreen extends StatefulWidget {
-  const WebToonHomeScreen({super.key});
+class WebToonHomeScreen extends StatelessWidget {
+  WebToonHomeScreen({super.key});
 
-  @override
-  State<WebToonHomeScreen> createState() => _WebToonHomeScreenState();
-}
-
-class _WebToonHomeScreenState extends State<WebToonHomeScreen> {
-  List<WebToonModel> webtoons = [];
-  bool isLoading = true;
-
-  void waitForWebToons() async {
-    webtoons = await ApiService().getTodaysToons();
-    isLoading = false;
-    setState(() {});
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    waitForWebToons();
-  }
+  final webtoons = ApiService.getTodaysToons();
 
   @override
   Widget build(BuildContext context) {
-    print(webtoons);
-    print(isLoading);
     return MaterialApp(
       home: Scaffold(
         appBar: AppBar(
@@ -50,6 +29,16 @@ class _WebToonHomeScreenState extends State<WebToonHomeScreen> {
           ),
           backgroundColor: Colors.white,
           foregroundColor: Colors.green,
+        ),
+        body: FutureBuilder(
+          future: webtoons,
+          builder: (context, snapshot) {
+            if (snapshot.hasData) {
+              return const Text('There is Data!');
+            } else {
+              return const Text('Loading...');
+            }
+          },
         ),
       ),
     );
