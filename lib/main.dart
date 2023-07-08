@@ -1,20 +1,35 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:toonflix/models/webtoon_model.dart';
 import 'package:toonflix/screens/home_screen.dart';
 import 'package:toonflix/screens/pomodoros_challenge_screen.dart';
 import 'package:toonflix/services/api_service.dart';
 import 'package:toonflix/widgets/button.dart';
 import 'package:toonflix/widgets/currency_card.dart';
 import 'package:toonflix/widgets/schedule_card.dart';
+import 'package:toonflix/widgets/webtoon_widget.dart';
+
+class MyHttpOverrides extends HttpOverrides {
+  @override
+  HttpClient createHttpClient(SecurityContext? context) {
+    return super.createHttpClient(context)
+      ..userAgent =
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/110.0.0.0 Safari/537.36';
+  }
+}
 
 void main() {
+  HttpOverrides.global = MyHttpOverrides();
+
   runApp(WebToonHomeScreen());
 }
 
 class WebToonHomeScreen extends StatelessWidget {
   WebToonHomeScreen({super.key});
 
-  final webtoons = ApiService.getTodaysToons();
+  var webtoons = ApiService.getTodaysToons();
 
   @override
   Widget build(BuildContext context) {
@@ -34,14 +49,46 @@ class WebToonHomeScreen extends StatelessWidget {
           future: webtoons,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              return const Text('There is Data!');
+              return Column(
+                children: [
+                  const SizedBox(
+                    height: 50,
+                  ),
+                  Expanded(
+                    child: makeList(snapshot),
+                  ),
+                ],
+              );
             } else {
-              return const Text('Loading...');
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
             }
           },
         ),
       ),
     );
+  }
+
+  ListView makeList(AsyncSnapshot<List<WebToonModel>> snapshot) {
+    return ListView.separated(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 20,
+        ),
+        scrollDirection: Axis.horizontal,
+        itemBuilder: (context, index) {
+          var webtoon = snapshot.data![index];
+          return WebToon(
+            id: webtoon.id,
+            title: webtoon.title,
+            thumb: webtoon.thumb,
+          );
+        },
+        separatorBuilder: (context, index) => const SizedBox(
+              width: 40,
+            ),
+        itemCount: snapshot.data!.length);
   }
 }
 
