@@ -73,7 +73,7 @@ class WebToonHomeScreen extends StatelessWidget {
   ListView makeList(AsyncSnapshot<List<WebToonModel>> snapshot) {
     return ListView.separated(
         padding: const EdgeInsets.symmetric(
-          horizontal: 10,
+          horizontal: 20,
           vertical: 20,
         ),
         scrollDirection: Axis.horizontal,
