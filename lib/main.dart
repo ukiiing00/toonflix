@@ -6,8 +6,10 @@ import 'package:toonflix/models/webtoon_model.dart';
 import 'package:toonflix/screens/home_screen.dart';
 import 'package:toonflix/screens/pomodoros_challenge_screen.dart';
 import 'package:toonflix/services/api_service.dart';
+import 'package:toonflix/services/movie_api_services.dart';
 import 'package:toonflix/widgets/button.dart';
 import 'package:toonflix/widgets/currency_card.dart';
+import 'package:toonflix/widgets/make_movies_list.dart';
 import 'package:toonflix/widgets/schedule_card.dart';
 import 'package:toonflix/widgets/webtoon_widget.dart';
 
@@ -23,9 +25,64 @@ class MyHttpOverrides extends HttpOverrides {
 void main() {
   HttpOverrides.global = MyHttpOverrides();
 
-  runApp(WebToonHomeScreen());
+  runApp(MovieCodeChallenge());
 }
 
+class MovieCodeChallenge extends StatelessWidget {
+  MovieCodeChallenge({super.key});
+
+  var popular = MovieApiService.getPopularMovies();
+  var nowPlaying = MovieApiService.getNowPlayingMovies();
+  var comingSoon = MovieApiService.getComingSoonMovies();
+
+  static String imgUrl = 'https://image.tmdb.org/t/p/w500';
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: Padding(
+          padding: const EdgeInsets.only(
+            left: 20,
+            top: 110,
+            bottom: 50,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                MakeMovieList(
+                  futureMovie: popular,
+                  imgUrl: imgUrl,
+                  title: 'Popular Movies',
+                  onlyThumb: true,
+                ),
+                const SizedBox(
+                  height: 20,
+                ),
+                MakeMovieList(
+                    onlyThumb: false,
+                    title: 'Now in Cinemas',
+                    futureMovie: nowPlaying,
+                    imgUrl: imgUrl),
+                const SizedBox(
+                  height: 20,
+                ),
+                MakeMovieList(
+                    onlyThumb: false,
+                    title: 'Coming Soon',
+                    futureMovie: comingSoon,
+                    imgUrl: imgUrl)
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ignore: must_be_immutable
 class WebToonHomeScreen extends StatelessWidget {
   WebToonHomeScreen({super.key});
 
