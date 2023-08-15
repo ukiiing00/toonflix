@@ -25,7 +25,7 @@ class MyHttpOverrides extends HttpOverrides {
 void main() {
   HttpOverrides.global = MyHttpOverrides();
 
-  runApp(MovieCodeChallenge());
+  runApp(const CodeChallenge());
 }
 
 class MovieCodeChallenge extends StatelessWidget {
@@ -238,6 +238,7 @@ class CodeChallenge extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     color: Colors.white.withOpacity(0.8),
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -262,7 +263,7 @@ class CodeChallenge extends StatelessWidget {
                   Text(
                     '17  18  19  2',
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: Colors.white.withOpacity(0.4),
                       fontSize: 40,
                     ),
                   )
@@ -377,9 +378,9 @@ class App extends StatelessWidget {
                 const SizedBox(
                   height: 30,
                 ),
-                Row(
+                const Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: const [
+                  children: [
                     Button(
                       text: 'Transfer',
                       bgColor: Color(0xFFF1B33B),
