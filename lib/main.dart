@@ -25,7 +25,7 @@ class MyHttpOverrides extends HttpOverrides {
 void main() {
   HttpOverrides.global = MyHttpOverrides();
 
-  runApp(const CodeChallenge());
+  runApp(const PomodorosChallenge());
 }
 
 class MovieCodeChallenge extends StatelessWidget {

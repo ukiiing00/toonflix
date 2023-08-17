@@ -16,27 +16,60 @@ class _PomodoroChallengeScreenState extends State<PomodoroChallengeScreen> {
   int selectMinute = 1500;
   int totalSecond = 1500;
   bool isRunning = false;
-  int totalRound = 1;
+  int totalRound = 0;
   int totalGoal = 1;
   int _selectNum = 2;
+  bool isBreakTime = false;
 
   late Timer timer;
 
+  late final ScrollController _scrollController =
+      ScrollController(initialScrollOffset: _selectNum * 90);
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   void onSelectTime({required int time, required int index}) {
+    timer.cancel();
     setState(() {
+      isRunning = false;
       _selectNum = index;
       selectMinute = time * 60;
       totalSecond = selectMinute;
+      _scrollController.animateTo(
+        index * 90,
+        duration: const Duration(milliseconds: 500),
+        curve: Curves.linear,
+      );
+    });
+  }
+
+  void breakTime() {
+    totalSecond = 5 * 60;
+    timer = Timer.periodic(
+      const Duration(seconds: 1),
+      onTick,
+    );
+    setState(() {
+      isBreakTime = true;
+      isRunning = true;
     });
   }
 
   void onTick(Timer timer) {
+    print(timer.tick);
     if (totalSecond == 0) {
       if (totalRound == 4) {
         totalGoal + 1;
         totalRound = 1;
+        breakTime();
+      } else if (isBreakTime) {
+        isBreakTime = false;
       } else {
         totalRound += 1;
+        breakTime();
       }
       setState(() {
         isRunning = false;
@@ -51,6 +84,7 @@ class _PomodoroChallengeScreenState extends State<PomodoroChallengeScreen> {
   }
 
   void onStartPressed() {
+    if (totalRound == 0) totalRound = 1;
     timer = Timer.periodic(
       const Duration(seconds: 1),
       onTick,
@@ -232,10 +266,11 @@ class _PomodoroChallengeScreenState extends State<PomodoroChallengeScreen> {
           Flexible(
             flex: 1,
             child: SizedBox(
-              height: 60,
+              height: 50,
               child: ListView.separated(
+                controller: _scrollController,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 30,
+                  horizontal: 161,
                 ),
                 separatorBuilder: (context, index) => const SizedBox(
                   width: 20,
@@ -243,29 +278,36 @@ class _PomodoroChallengeScreenState extends State<PomodoroChallengeScreen> {
                 scrollDirection: Axis.horizontal,
                 itemCount: minutes.length,
                 itemBuilder: (context, index) {
-                  print(index);
+                  var opacity = 1 - (index - _selectNum).abs() * 0.4;
                   return GestureDetector(
                     onTap: () =>
                         onSelectTime(time: minutes[index], index: index),
-                    child: Container(
-                      width: 70,
-                      decoration: BoxDecoration(
-                        color: _selectNum == index ? Colors.white : null,
-                        border: Border.all(
-                          width: 3,
-                          color: Colors.white.withOpacity(0.5),
-                        ),
-                        borderRadius: BorderRadius.circular(5),
-                      ),
-                      child: Center(
-                        child: Text(
-                          '${minutes[index]}',
-                          style: TextStyle(
-                            color: _selectNum == index
-                                ? Theme.of(context).primaryColor
-                                : Colors.white.withOpacity(0.6),
-                            fontSize: 28,
-                            fontWeight: FontWeight.bold,
+                    child: AnimatedOpacity(
+                      opacity: opacity.abs(),
+                      duration: const Duration(milliseconds: 500),
+                      child: Align(
+                        alignment: Alignment.bottomLeft,
+                        child: Container(
+                          width: 70,
+                          decoration: BoxDecoration(
+                            color: _selectNum == index ? Colors.white : null,
+                            border: Border.all(
+                              width: 3,
+                              color: Colors.white,
+                            ),
+                            borderRadius: BorderRadius.circular(5),
+                          ),
+                          child: Center(
+                            child: Text(
+                              '${minutes[index]}',
+                              style: TextStyle(
+                                color: _selectNum == index
+                                    ? Theme.of(context).primaryColor
+                                    : Colors.white,
+                                fontSize: 28,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -277,38 +319,44 @@ class _PomodoroChallengeScreenState extends State<PomodoroChallengeScreen> {
           ),
           Flexible(
             flex: 2,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            child: Stack(
+              fit: StackFit.loose,
               children: [
-                GestureDetector(
-                  onTap: isRunning ? onStopPressed : onStartPressed,
-                  child: Container(
-                    height: 100,
-                    width: 100,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(0xFFBF3B2B),
-                    ),
-                    child: Icon(
-                      isRunning ? Icons.pause : Icons.play_arrow,
-                      size: 70,
-                      color: Colors.white,
+                Align(
+                  alignment: const Alignment(0, 0),
+                  child: GestureDetector(
+                    onTap: isRunning ? onStopPressed : onStartPressed,
+                    child: Container(
+                      height: 110,
+                      width: 110,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Color(0xFFBF3B2B),
+                      ),
+                      child: Icon(
+                        isRunning ? Icons.pause : Icons.play_arrow,
+                        size: 70,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
-                GestureDetector(
-                  onTap: onResetPressed,
-                  child: Container(
-                    height: 100,
-                    width: 100,
-                    decoration: const BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Color(0xFFBF3B2B),
-                    ),
-                    child: const Icon(
-                      Icons.refresh_outlined,
-                      size: 70,
-                      color: Colors.white,
+                Align(
+                  alignment: const Alignment(0.4, 1.2),
+                  child: GestureDetector(
+                    onTap: onResetPressed,
+                    child: Container(
+                      height: 40,
+                      width: 40,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white,
+                      ),
+                      child: const Icon(
+                        Icons.refresh_outlined,
+                        size: 25,
+                        color: Color(0xFFBF3B2B),
+                      ),
                     ),
                   ),
                 ),
